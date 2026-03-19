@@ -1,6 +1,6 @@
 import requests
 import json
-
+from src.utils.platform_tools import get_platform_info
 from src.utils.platform_tools import get_config_path
 
 class WeatherAPI:
@@ -11,3 +11,51 @@ class WeatherAPI:
             self.config = json.load(f)
             self.api_key = self.config.get("api_key","")
             self.base_url = self.config.get("base_url","https://devapi.qweather.com")
+
+    def get_weather(self,city="北京"):
+        """获取天气信息(支持Windows/linux不同API配置"""
+        try:
+        #使用和风天气API
+            url=f"{self.base_url}/v7/weather/now"
+            params = {
+                "location":city,
+                "key":self.api_key
+            }
+
+            response = requests.get(url,params=params,timeout=10)
+            data = response.json()
+
+            if data["code"]=="200":
+                return self._format_weather(data["now"],city)
+            else:
+                return f"获取天气失败:{data.get('message','未知错误')}"
+
+        except requests.exceptions.Timeout:
+            return"请求超时，请检查网络"
+        except Exception as e:
+            return f"获取天气出错: {str(e)}"
+
+    def _format_weather(self,weather_data,city):
+        """格式化天气信息(平台特定格式化)"""
+        plat_info=get_platform_info()
+
+        temp = weather_data["temp"]
+        text = weather_data["text"]
+        humidity = weather_data["humidity"]
+        wind_dir = weather_data["windDir"]
+        wind_scale = weather_data["windScale"]
+
+        if plat_info["is_windows"]:
+        #Windows使用cmd默认编码,可能需要调整
+            return (f"{city}天气：\n"
+                    f"温度：{temp}°C\n"
+                    f"天气：{text}\n"
+                    f"湿度：{humidity}%\n"
+                    f"风力：{wind_dir} {wind_scale}级")
+        else:
+        # Linux终端支持更多Unicode字符
+            return (f"🌤️  {city}天气\n"
+                    f"🌡️  温度：{temp}°C\n"
+                    f"☁️  天气：{text}\n"
+                    f"💧 湿度：{humidity}%\n"
+                    f"🍃 风力：{wind_dir} {wind_scale}级")

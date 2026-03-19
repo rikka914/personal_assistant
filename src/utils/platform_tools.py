@@ -2,7 +2,7 @@ import os
 import sys
 import platform
 
-def get_paltform_info():
+def get_platform_info():
     """获取平台信息"""
     system = platform.system()
     release = platform.release()
@@ -18,7 +18,7 @@ def get_paltform_info():
 
 def get_config_path(config_type):
     """根据平台返回配置路径"""
-    plat_info = get_paltform_info()
+    plat_info = get_platform_info()
     config_dir = os.path.join(os.path.dirname(__file__),"..","..","config")
 
     if plat_info["is_windows"]:
@@ -30,7 +30,7 @@ def get_config_path(config_type):
 
 def clear_screen():
     """跨平台清屏"""
-    plat_info = get_paltform_info()
+    plat_info = get_platform_info()
     if plat_info["is_windows"]:
         os.system("cls")
     if plat_info["is_linux"]:
@@ -38,7 +38,7 @@ def clear_screen():
 
 def open_file_in_explorer(filepath):
     """在文件管理器中打开文件"""
-    plat_info = get_paltform_info()
+    plat_info = get_platform_info()
     directory = os.path.dirname(filepath)
     if plat_info["is_windows"]:
         os.startfile(directory)
