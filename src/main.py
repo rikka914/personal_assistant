@@ -79,8 +79,6 @@ def main():
                 quote_manager.show_menu()
 
             elif choice == "5":
-                from utils.platform_tools import get_platform_info
-
                 info = get_platform_info()
                 print(f"\n系统信息：")
                 print(f"操作系统：{info['system']} {info['release']}")
