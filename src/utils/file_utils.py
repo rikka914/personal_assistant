@@ -32,11 +32,12 @@ def save_json(data,filename):
     return filepath
 
 def load_json(filename,default=None):
-    """加载json数据"""
+    """加载json数据,如果不存在放回默认值"""
     data_dir = get_data_dir()
     filepath = os.path.join(data_dir,filename)
 
     if not os.path.exists(filepath):
+    #如果文件不存在，就返回默认值；但如果没有指定默认值，就返回空字典
         return default if default is not None else {}
 
     with open(filepath,'r',encoding='utf-8') as f:
