@@ -28,13 +28,19 @@ def get_config_path(config_type):
     else:
         return os.path.join(config_dir,f"default_{config_type}.json")
 
+
 def clear_screen():
     """跨平台清屏"""
     plat_info = get_platform_info()
     if plat_info["is_windows"]:
         os.system("cls")
-    if plat_info["is_linux"]:
+    elif plat_info["is_linux"]:
         os.system("clear")
+    elif plat_info["is_mac"]:
+        os.system("clear")  # macOS也使用clear
+    else:
+        print("不支持的平台，无法清屏")
+
 
 def open_file_in_explorer(filepath):
     """在文件管理器中打开文件"""
