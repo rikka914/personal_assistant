@@ -1,1 +1,2 @@
+# personal_assistant - 核心依赖
 requests>=2.25.1
