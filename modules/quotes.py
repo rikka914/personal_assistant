@@ -10,9 +10,11 @@ from src.utils.file_utils import save_json, load_json
 class QuoteManager:
     def __init__(self):
         """初始化名言管理器"""
+        #尝试从文件加载名言名句，如果不存在，就使用默认名言库
         self.quotes = load_json("quotes.json", default=self._get_default_quotes())
         # 计算下一个ID
         if self.quotes:
+            #列表推导式:从名言库.json文件中提取ID字段,.get("id",0):安全获取，如果某条名言没有ID返回0，找到后最大ID+1，作为下条名言的ID
             self.next_id = max([quote.get("id", 0) for quote in self.quotes]) + 1
         else:
             self.next_id = 1
@@ -27,27 +29,30 @@ class QuoteManager:
             "id": self.next_id,
             "text": text,
             "author": author,
-            "favorite": False
+            "favorite": False   #默认未收藏
         }
         self.quotes.append(quote)
-        self.next_id += 1
-        self.save()
+        self.next_id += 1   #ID自增
+        self.save()     #自动保存
         return quote
     
     def get_random_quote(self):
         """获取随机名言"""
         if not self.quotes:
-            return {"text": "今天也是充满希望的一天！", "author": "小爱"}
+            return {"text": "今天也是充满希望的一天！", "author": "小爱"} #防御性编程:如果没有名言，返回一个默认值
         return random.choice(self.quotes)
     
     def toggle_favorite(self, quote_id):
-        """切换收藏状态"""
+        """切换收藏状态
+            线性搜索（遍历列表）找到对应ID的名言
+            not quote["favorite"]：False变True，True变False，实现开关效果。
+        """
         for quote in self.quotes:
             if quote["id"] == quote_id:
-                quote["favorite"] = not quote["favorite"]
+                quote["favorite"] = not quote["favorite"]   #布尔值取反
                 self.save()
                 return True
-        return False
+        return False    #没找到对应ID
     
     def get_favorites(self):
         """获取收藏的名言"""
