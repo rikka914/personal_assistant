@@ -13,12 +13,19 @@ class WeatherAPI:
             self.base_url = self.config.get("base_url","https://devapi.qweather.com")
 
     def get_weather(self,city="北京"):
-        """获取天气信息(支持Windows/linux不同API配置"""
+        """获取天气信息(支持Windows/linux不同API配置,支持中文城市名自动转ID"""
         try:
-        #使用和风天气API
+            #1.如果是中文名，先获取城市ID
+            city_id = city
+            if not city.isdigit():
+                city_id = self._get_city_id(city)
+                if not city_id:
+                    return f"找不到城市 '{city}',请检查名称或使用城市ID"
+
+            #2.获取天气(使用城市ID)
             url=f"{self.base_url}/v7/weather/now"
             params = {
-                "location":city,
+                "location":city_id,
                 "key":self.api_key
             }
 
@@ -35,6 +42,23 @@ class WeatherAPI:
         except Exception as e:
             return f"获取天气出错: {str(e)}"
 
+    def _get_city_id(self,city_name):
+        """通过城市名获取城市ID"""
+        try:
+            search_url = f"{self.base_url}/geo/v2/city/lookup"
+            params = {
+                "location":city_name,
+                "key":self.api_key,
+                "range":"cn",
+            }
+            response = requests.get(search_url,params=params,timeout=10)
+            data = response.json()
+            if data["code"]=="200" and data.get("location"):
+                #返回第一个匹配城市的ID
+                return data["location"][0]["id"]
+        except:
+            pass
+        return None
     def _format_weather(self,weather_data,city):
         """格式化天气信息(平台特定格式化)"""
         plat_info=get_platform_info()
