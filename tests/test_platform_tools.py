@@ -31,4 +31,6 @@ class TestPlatformTools(unittest.TestCase):
         except Exception as e:
             self.fail(f"clear_screen()报错:{e}")
 
+if __name__ == "__main__":
+    unittest.main()
 
